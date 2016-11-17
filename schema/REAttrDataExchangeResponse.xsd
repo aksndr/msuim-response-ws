@@ -1,0 +1,187 @@
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://inform.gazprom.ru/C/SUIM/REDataExchange" targetNamespace="http://inform.gazprom.ru/C/SUIM/REDataExchange">
+	<xsd:complexType name="REAttrDataExchangeResponse">
+		<xsd:sequence>
+			<xsd:element name="LogicalSystem">
+				<xsd:annotation>
+					<xsd:documentation>Логическая система</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="10"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="InternalObjectNumber" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Номер объекта</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="70"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="ExternalObjectNumber">
+				<xsd:annotation>
+					<xsd:documentation>Номер объекта</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="70"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="Tray_Code" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Номер лотка СУИМ</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="2"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="Success" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Общий флаг</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="Destination">
+				<xsd:annotation>
+					<xsd:documentation>БЕ получателя</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="4"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="ParentMsgID" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>ID сообщения PI к которому относится данный ответ</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Files" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Данные о файлах</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="File" maxOccurs="unbounded">
+							<xsd:complexType>
+								<xsd:sequence>
+									<xsd:element name="File_Name">
+										<xsd:annotation>
+											<xsd:documentation>Имя файла</xsd:documentation>
+										</xsd:annotation>
+										<xsd:simpleType>
+											<xsd:restriction base="xsd:string">
+												<xsd:maxLength value="283"/>
+											</xsd:restriction>
+										</xsd:simpleType>
+									</xsd:element>
+									<xsd:element name="File_Size">
+										<xsd:annotation>
+											<xsd:documentation>Размер файла</xsd:documentation>
+										</xsd:annotation>
+										<xsd:simpleType>
+											<xsd:restriction base="xsd:string">
+												<xsd:maxLength value="12"/>
+											</xsd:restriction>
+										</xsd:simpleType>
+									</xsd:element>
+									<xsd:element name="Internal_File_ID" minOccurs="0">
+										<xsd:annotation>
+											<xsd:documentation>ID файла (внутренний)</xsd:documentation>
+										</xsd:annotation>
+										<xsd:simpleType>
+											<xsd:restriction base="xsd:string">
+												<xsd:maxLength value="250"/>
+											</xsd:restriction>
+										</xsd:simpleType>
+									</xsd:element>
+									<xsd:element name="External_File_ID">
+										<xsd:annotation>
+											<xsd:documentation>ID файла (внешний)</xsd:documentation>
+										</xsd:annotation>
+										<xsd:simpleType>
+											<xsd:restriction base="xsd:string">
+												<xsd:maxLength value="250"/>
+											</xsd:restriction>
+										</xsd:simpleType>
+									</xsd:element>
+									<xsd:element name="Current_Part">
+										<xsd:annotation>
+											<xsd:documentation>Текущая часть файла</xsd:documentation>
+										</xsd:annotation>
+										<xsd:simpleType>
+											<xsd:restriction base="xsd:integer">
+												<xsd:totalDigits value="4"/>
+											</xsd:restriction>
+										</xsd:simpleType>
+									</xsd:element>
+									<xsd:element name="All_Parts">
+										<xsd:annotation>
+											<xsd:documentation>Всего частей в файле</xsd:documentation>
+										</xsd:annotation>
+										<xsd:simpleType>
+											<xsd:restriction base="xsd:integer">
+												<xsd:totalDigits value="4"/>
+											</xsd:restriction>
+										</xsd:simpleType>
+									</xsd:element>
+									<xsd:element name="Location_SUIM" minOccurs="0">
+										<xsd:annotation>
+											<xsd:documentation>Метка расположения файла в СУИМ</xsd:documentation>
+										</xsd:annotation>
+										<xsd:simpleType>
+											<xsd:restriction base="xsd:string">
+												<xsd:maxLength value="1"/>
+											</xsd:restriction>
+										</xsd:simpleType>
+									</xsd:element>
+									<xsd:element name="Location_ELAR" minOccurs="0">
+										<xsd:annotation>
+											<xsd:documentation>Метка расположения файла в ЭЛАР</xsd:documentation>
+										</xsd:annotation>
+										<xsd:simpleType>
+											<xsd:restriction base="xsd:string">
+												<xsd:maxLength value="1"/>
+											</xsd:restriction>
+										</xsd:simpleType>
+									</xsd:element>
+									<xsd:element name="ErrorText" minOccurs="0">
+										<xsd:annotation>
+											<xsd:documentation>Текст ошибки</xsd:documentation>
+										</xsd:annotation>
+										<xsd:complexType>
+											<xsd:sequence>
+												<xsd:element name="Line" type="xsd:string" maxOccurs="unbounded"/>
+											</xsd:sequence>
+										</xsd:complexType>
+									</xsd:element>
+								</xsd:sequence>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="ErrorText" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Текст ошибки</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="Line" type="xsd:string" maxOccurs="unbounded"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

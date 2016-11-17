@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<nm:REAttrDataExchangeMessage xmlns:prx="urn:sap.com:proxy:QAS:/1SAI/TASB392A34CA3373E648A50:702"
+                              xmlns:nm="http://inform.gazprom.ru/C/SUIM/REDataExchange">-
+    <Header>
+        <LogicalSystem>QASCLNT400</LogicalSystem>
+        <ObjectType>I0</ObjectType>
+        <ObjectNumber>I000000000000000030842</ObjectNumber>
+        <Activity>02</Activity>
+        <ObjectTypeDiff>ZEC1</ObjectTypeDiff>
+        <Destination>1025</Destination>
+    </Header>
+
+    <OBJECT_REFS>
+        <OBJECT_REF>IS00010000001001475</OBJECT_REF>
+        <ObjCommType>02</ObjCommType>
+        <LINK>00</LINK>
+    </OBJECT_REFS>
+
+    <OBJECT_REFS>
+        <OBJECT_REF>IS00010000001001492</OBJECT_REF>
+        <ObjCommType>01</ObjCommType>
+        <LINK>00</LINK>
+    </OBJECT_REFS>
+
+    <OBJECT_REFS>
+        <OBJECT_REF>IS10250000001000207</OBJECT_REF>
+        <ObjCommType>02</ObjCommType>
+        <LINK>00</LINK>
+    </OBJECT_REFS>
+
+    <OBJECT_REFS>
+        <OBJECT_REF>IS00010000001001467</OBJECT_REF>
+        <ObjCommType>01</ObjCommType>
+        <LINK>00</LINK>
+    </OBJECT_REFS>
+
+    <GENERAL>
+        <DOCTYPE>1031</DOCTYPE>
+        <DOCGR_CODE>2BBCA</DOCGR_CODE>
+        <DOCNUM>8957</DOCNUM>
+        <DOCDATE>2016-01-29</DOCDATE>
+        <DOCNAME>Договор аренды123</DOCNAME>
+        <REMARKS>1e5</REMARKS>
+        <RERF>Admin</RERF>
+        <AUTORDOC>Администратор П.А.</AUTORDOC>
+    </GENERAL>
+
+    <CONTRACT>
+        <BP1>97451</BP1>
+        <XBP1>Газпром ПХГ</XBP1>
+        <BP2>97451</BP2>
+        <XBP2>Газпром ПХГ</XBP2>
+        <RECNBEG>2012-04-20</RECNBEG>
+        <RECNEND1ST>2016-01-29</RECNEND1ST>
+        <RECNREGDJR>1970-01-01</RECNREGDJR>
+        <RECNREGJR>344</RECNREGJR>
+        <RECNREGDCH>2012-04-20</RECNREGDCH>
+        <RECNNRCH>1-75/12-26</RECNNRCH>
+        <RECNREGST>7688</RECNREGST>
+        <RECNREGDST>1970-01-01</RECNREGDST>
+    </CONTRACT>
+
+    <AttrFile>
+        <File_ID>49DDFF6840BA1ED6A998BB6421421FA8</File_ID>
+        <Current_Part>0</Current_Part>
+        <All_Parts>0</All_Parts>
+        <Current_Hash/>
+        <All_Hash/>
+        <NOMER>4</NOMER>
+        <FILE_NAME>OpenText Extended ECM for SAP Overview guide</FILE_NAME>
+        <DATUM/>
+        <Delete>true</Delete>
+    </AttrFile>
+
+    <AttrFile>
+        <File_ID>49DDFF6840BA1ED6A9B061BADF5B14E8</File_ID>
+        <Current_Part>1</Current_Part>
+        <All_Parts>1</All_Parts>
+        <Current_Hash>564455294AE0CC6EA5591CFCDC2139CBC1DE9308</Current_Hash>
+        <All_Hash>564455294AE0CC6EA5591CFCDC2139CBC1DE9308</All_Hash>
+        <NOMER>2</NOMER>
+        <FILE_NAME>Livelink Module Development Guide</FILE_NAME>
+        <DATUM/>
+    </AttrFile>
+</nm:REAttrDataExchangeMessage>

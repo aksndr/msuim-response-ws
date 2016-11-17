@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" targetNamespace="http://inform.gazprom.ru/C/SUIM/REDataExchange" xmlns:tns="http://inform.gazprom.ru/C/SUIM/REDataExchange" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="REAttrDataExchangeMessage" type="tns:REDataExchangeAttrECD"/>
+
+  <xs:complexType name="REDataExchangeAttrECD">
+    <xs:sequence>
+      <xs:element name="Header" type="tns:REDataExchangeHeader"/>
+      <xs:element name="OBJECT_REFS" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="OBJECT_REF" type="xs:string"/>
+            <xs:element name="ObjCommType" type="xs:string" minOccurs="0"/>
+            <xs:element name="LINK" type="xs:string" minOccurs="0"/>
+            <xs:element name="DOCGUID" type="xs:string" minOccurs="0"/>
+            <xs:element name="Delete" type="xs:boolean" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="PARTNER_REFS" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="PARTNER_REF" type="xs:string"/>
+            <xs:element name="LINK" type="xs:string" minOccurs="0"/>
+            <xs:element name="DOCGUID" type="xs:string"/>
+            <xs:element name="Delete" type="xs:boolean" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="GENERAL">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="DOCTYPE" type="xs:string"/>
+            <xs:element name="DOCGR_CODE" type="xs:string"/>
+            <xs:element name="DOCNUM" type="xs:string"/>
+            <xs:element name="DOCDATE" type="xs:date"/>
+            <xs:element name="DOCNAME" type="xs:string" minOccurs="0"/>
+            <xs:element name="NODOCNUM" type="xs:boolean" minOccurs="0"/>
+            <xs:element name="NODOCDATE" type="xs:boolean" minOccurs="0"/>
+            <xs:element name="REMARKS" type="xs:string" minOccurs="0"/>
+            <xs:element name="RERF" type="xs:string"/>
+            <xs:element name="AUTORDOC" type="xs:string"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="CONTRACT" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="BP1" type="xs:string"/>
+            <xs:element name="XBP1" type="xs:string"/>
+            <xs:element name="BP2" type="xs:string"/>
+            <xs:element name="XBP2" type="xs:string"/>
+            <xs:element name="RECNBEG" type="xs:date" minOccurs="0"/>
+            <xs:element name="RECNEND1ST" type="xs:date" minOccurs="0"/>
+            <xs:element name="RECNREGDJR" type="xs:date" minOccurs="0"/>
+            <xs:element name="RECNREGJR" type="xs:string" minOccurs="0"/>
+            <xs:element name="RECNREGDCH" type="xs:date" minOccurs="0"/>
+            <xs:element name="RECNNRCH" type="xs:string" minOccurs="0"/>
+            <xs:element name="RECNREGST" type="xs:string" minOccurs="0"/>
+            <xs:element name="RECNREGDST" type="xs:date" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="FINDOC" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RECNNREXT" type="xs:string"/>
+            <xs:element name="XCHILDORG" type="xs:string" minOccurs="0"/>
+            <xs:element name="RECND" type="xs:date"/>
+            <xs:element name="AJAHR" type="xs:string" minOccurs="0"/>
+            <xs:element name="RECNTYPE" type="xs:string"/>
+            <xs:element name="SUMMA" type="xs:string" minOccurs="0"/>
+            <xs:element name="TAXAMOUNT" type="xs:string" minOccurs="0"/>
+            <xs:element name="CALCCURR" type="xs:string" minOccurs="0"/>
+            <xs:element name="DESCRIPTION" type="xs:string" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="LETTERS" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="CHILDORG1" type="xs:string"/>
+            <xs:element name="XCHILDORG1" type="xs:string"/>
+            <xs:element name="SENDERFIO" type="xs:string"/>
+            <xs:element name="CHILDORG2" type="xs:string"/>
+            <xs:element name="XCHILDORG2" type="xs:string"/>
+            <xs:element name="RECEIVERFIO" type="xs:string" minOccurs="0"/>
+            <xs:element name="DESCRIPTION" type="xs:string" minOccurs="0"/>
+            <xs:element name="SUMMA" type="xs:string" minOccurs="0"/>
+            <xs:element name="CALCCURR" type="xs:string" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ANY" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="CUSTOMER" type="xs:string"/>
+            <xs:element name="CHILDORG" type="xs:string"/>
+            <xs:element name="XCHILDORG" type="xs:string"/>
+            <xs:element name="PERIODBEGIN" type="xs:date"/>
+            <xs:element name="CONSTRUCTOBJECT" type="xs:string" minOccurs="0"/>
+            <xs:element name="CONSTRUCTNAME" type="xs:string" minOccurs="0"/>
+            <xs:element name="PERIOD" type="xs:date" minOccurs="0"/>
+            <xs:element name="LINKDOCNUM" type="xs:string" minOccurs="0"/>
+            <xs:element name="LINKDOCDATE" type="xs:date" minOccurs="0"/>
+            <xs:element name="SUMMA" type="xs:string" minOccurs="0"/>
+            <xs:element name="CALCCURR" type="xs:string" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ACTS" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="BP1" type="xs:string"/>
+            <xs:element name="XBP1" type="xs:string"/>
+            <xs:element name="BP2" type="xs:string"/>
+            <xs:element name="XBP2" type="xs:string"/>
+            <xs:element name="RECVDOCNUM" type="xs:string" minOccurs="0"/>
+            <xs:element name="RECVDOCDATE" type="xs:date" minOccurs="0"/>
+            <xs:element name="KADASTRNUM" type="xs:string" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="KPD" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="LAWSUBJECT" type="xs:string"/>
+            <xs:element name="XLAWSUBJECT" type="xs:string"/>
+            <xs:element name="XOLTYPE" type="xs:string"/>
+            <xs:element name="OLTYPE" type="xs:string" minOccurs="0"/>
+            <xs:element name="REGNUM" type="xs:string"/>
+            <xs:element name="REGDATE" type="xs:date"/>
+            <xs:element name="CERTSER" type="xs:string"/>
+            <xs:element name="CERTNUM" type="xs:string"/>
+            <xs:element name="CERTDATE" type="xs:date"/>
+            <xs:element name="CHILDORG" type="xs:string"/>
+            <xs:element name="XCHILDORG" type="xs:string"/>
+            <xs:element name="XOBJOFLAW" type="xs:string"/>
+            <xs:element name="KADASTRNUM" type="xs:string" minOccurs="0"/>
+            <xs:element name="XLAWTYPE" type="xs:string" minOccurs="0"/>
+            <xs:element name="LAWTYPE" type="xs:string" minOccurs="0"/>
+            <xs:element name="INVENTORNUM" type="xs:string" minOccurs="0"/>
+            <xs:element name="BP1" type="xs:string" minOccurs="0"/>
+            <xs:element name="RECNREGOROLD" type="xs:string" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="DFV" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="MANAGING_SUBJEC" type="xs:string"/>
+            <xs:element name="XMANAGING_SUBJEC" type="xs:string" minOccurs="0"/>
+            <xs:element name="BUKRS" type="xs:string" minOccurs="0"/>
+            <xs:element name="REGDATE" type="xs:date" minOccurs="0"/>
+            <xs:element name="REGNUM" type="xs:string" minOccurs="0"/>
+            <xs:element name="DOCNUM" type="xs:string" minOccurs="0"/>
+            <xs:element name="DOCDATE" type="xs:date" minOccurs="0"/>
+            <xs:element name="DOCNAME" type="xs:string" minOccurs="0"/>
+            <xs:element name="NODOCNUM" type="xs:boolean" minOccurs="0"/>
+            <xs:element name="NODOCDATE" type="xs:boolean" minOccurs="0"/>
+            <xs:element name="REMARKS" type="xs:string" minOccurs="0"/>
+            <xs:element name="REGORGAN" type="xs:string" minOccurs="0"/>
+            <xs:element name="DESCRIPTION" type="xs:string" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="NNA" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="CHILDORG1" type="xs:string"/>
+            <xs:element name="XCHILDORG1" type="xs:string"/>
+            <xs:element name="OBJNAME" type="xs:string" minOccurs="0"/>
+            <xs:element name="OBJPLACE" type="xs:string" minOccurs="0"/>
+            <xs:element name="KADASTRNUM" type="xs:string" minOccurs="0"/>
+            <xs:element name="OGRN" type="xs:string" minOccurs="0"/>
+            <xs:element name="EGRJLDATE" type="xs:date" minOccurs="0"/>
+            <xs:element name="EGRPDATE" type="xs:date" minOccurs="0"/>
+            <xs:element name="EGRPNUM" type="xs:string" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="CCC" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RATINGOBJECT" type="xs:string"/>
+            <xs:element name="ESTIMATEDORG" type="xs:string" minOccurs="0"/>
+            <xs:element name="XESTIMATEDORG" type="xs:string" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="AttrFile" type="tns:REDataExchangeAttrFile" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="REDataExchangeHeader">
+    <xs:sequence>
+      <xs:element name="LogicalSystem" type="xs:string"/>
+      <xs:element name="ObjectType" type="xs:string"/>
+      <xs:element name="ObjectNumber" type="xs:string"/>
+      <xs:element name="ObjectNumber_ext" type="xs:string" minOccurs="0"/>
+      <xs:element name="Activity" type="xs:string"/>
+      <xs:element name="ObjectTypeDiff" type="xs:string"/>
+      <xs:element name="Destination" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="REDataExchangeAttrFile">
+    <xs:sequence>
+      <xs:element name="File_ID" type="xs:string"/>
+      <xs:element name="Current_Part" type="xs:integer"/>
+      <xs:element name="All_Parts" type="xs:integer"/>
+      <xs:element name="Current_Hash" type="xs:string"/>
+      <xs:element name="All_Hash" type="xs:string"/>
+      <xs:element name="NOMER" type="xs:integer"/>
+      <xs:element name="FILE_NAME" type="xs:string"/>
+      <xs:element name="USERS" type="xs:string" minOccurs="0"/>
+      <xs:element name="USERSTXT" type="xs:string" minOccurs="0"/>
+      <xs:element name="DATUM" type="xs:date"/>
+      <xs:element name="Delete" type="xs:boolean" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+
