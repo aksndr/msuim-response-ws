@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 public class REAttrDataExchangeOutConstant {
     public static final String MSUIMSYNC_SET_MSUIM_RESPONSE = "msuimsync.setMsuimResponse";
     public static final String MSUIMSYNC_GET_DATAID_BY_DOCNUM = "msuimsync.getDataIDByDocumentNumber";
+    public static final String MSUIMSYNC_GET_DATAID_BY_MSUIMNUM = "msuimsync.getDataIDByMSUIMNum";
     public static final String FUNCTION_PREFIX = "func";
     public static final String SEPARATOR = "=";
     public static final String AND = "&";

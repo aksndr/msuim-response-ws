@@ -245,7 +245,7 @@ public class REAttrDataExchangeService implements REAttrDataExchange {
                 logger.info("Got csAuth token: " + csAuthToken);
                 DocumentManagement docManClient = getDocumentManagement(csAuthToken);
 
-                Long parentId = getDataIDByDocNum(reAttrDataExchangeMessage.getGENERAL().getDOCNUM());
+                Long parentId = getDataID(reAttrDataExchangeMessage.getHeader().getObjectNumber());
 
                 if (attrFile.isDelete()) {
                     logger.info("File requested to be deleted.");
@@ -286,8 +286,8 @@ public class REAttrDataExchangeService implements REAttrDataExchange {
         }
     }
 
-    private Long getDataIDByDocNum(String objectNumber) throws Exception {
-        byte[] httPostRequest = createHttpPostRequest(objectNumber, MSUIMSYNC_GET_DATAID_BY_DOCNUM);
+    private Long getDataID(String objectNumber) throws Exception {
+        byte[] httPostRequest = createHttpPostRequest(objectNumber, MSUIMSYNC_GET_DATAID_BY_MSUIMNUM);
 
         String response = post(httPostRequest);
         JSONObject o = new JSONObject(response.toString());
