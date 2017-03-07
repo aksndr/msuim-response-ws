@@ -169,6 +169,11 @@ public class REAttrDataExchangeService implements REAttrDataExchange {
         return response;
     }
 
+    private JSONObject buildReAttrExchangeRequest2(Object reAttrDataExchangeResponse) {
+        JSONObject r = new JSONObject(reAttrDataExchangeResponse);
+        return r;
+    }
+
     private void fillErrorText(REAttrDataExchangeResponse reAttrDataExchangeResponse, JSONObject response) {
         REAttrDataExchangeResponse.ErrorText errorText = reAttrDataExchangeResponse.getErrorText();
         if (errorText != null && !errorText.getLine().isEmpty()) {
@@ -202,14 +207,10 @@ public class REAttrDataExchangeService implements REAttrDataExchange {
         try {
             strPostRequest.append(URLEncoder.encode(FUNCTION_PREFIX, UTF_8))
                     .append(SEPARATOR)
-                    .append(URLEncoder.encode(funcName, UTF_8));
-        } catch (UnsupportedEncodingException e) {
-            logger.error("Failed encode for " + FUNCTION_PREFIX + SEPARATOR + funcName);
-        }
+                    .append(URLEncoder.encode(funcName, UTF_8))
 
-        strPostRequest.append(AND);
-        try {
-            strPostRequest.append(URLEncoder.encode(CONTENT, UTF_8))
+                    .append(AND)
+                    .append(URLEncoder.encode(CONTENT, UTF_8))
                     .append(SEPARATOR)
                     .append(URLEncoder.encode(o.toString(), UTF_8));
         } catch (UnsupportedEncodingException e) {
@@ -231,7 +232,6 @@ public class REAttrDataExchangeService implements REAttrDataExchange {
             if (CollectionUtils.isEmpty(reAttrDataExchangeMessage.getAttrFile()))
                 throw new RuntimeException("Attribute AttrFile not found!");
 
-
             for (REDataExchangeAttrFile attrFile : reAttrDataExchangeMessage.getAttrFile()) {
                 String fileName = attrFile.getFILENAME();
                 logger.info("File Name : " + fileName);
@@ -241,11 +241,14 @@ public class REAttrDataExchangeService implements REAttrDataExchange {
 
                 Authentication authClient = getAuthenticationClient();
                 String csAuthToken = validateOTDSAuthToken(authClient, otdsAuthToken);
-//                String csAuthToken = authClient.authenticateUser("Admin", "livelink");
+//                String csAuthToken = authClient.authenticateUser("otadmin@otds.admin", "Qwerty!234");
                 logger.info("Got csAuth token: " + csAuthToken);
                 DocumentManagement docManClient = getDocumentManagement(csAuthToken);
 
-                Long parentId = getDataID(reAttrDataExchangeMessage.getHeader().getObjectNumber());
+//                Long parentId = getDataID(reAttrDataExchangeMessage.getHeader().getObjectNumber());
+
+                JSONObject ob = buildReAttrExchangeRequest2(reAttrDataExchangeMessage);
+                Long parentId = getDataID(ob);
 
                 if (attrFile.isDelete()) {
                     logger.info("File requested to be deleted.");
@@ -286,8 +289,8 @@ public class REAttrDataExchangeService implements REAttrDataExchange {
         }
     }
 
-    private Long getDataID(String objectNumber) throws Exception {
-        byte[] httPostRequest = createHttpPostRequest(objectNumber, MSUIMSYNC_GET_DATAID_BY_MSUIMNUM);
+    private Long getDataID(Object ob) throws Exception {
+        byte[] httPostRequest = createHttpPostRequest(ob, MSUIMSYNC_GET_DATAID_BY_MSUIMNUM);
 
         String response = post(httPostRequest);
         JSONObject o = new JSONObject(response.toString());
