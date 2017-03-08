@@ -1,17 +1,13 @@
 package ru.terralink.ws.msuim;
-
-import org.springframework.stereotype.Component;
+//Created by Arzamastsev on 08.03.2017.
 
 import java.io.InputStream;
 
-/**
- * Created by AzarovD on 03.02.2016.
- */
-@Component("attachmentInfo")
-public class AttachmentInfo {
+public class Attachment {
 
     private String contentType;
     private InputStream inputStream;
+
 
     public String getContentType() {
         return contentType;
@@ -28,4 +24,5 @@ public class AttachmentInfo {
     public void setInputStream(InputStream inputStream) {
         this.inputStream = inputStream;
     }
+
 }

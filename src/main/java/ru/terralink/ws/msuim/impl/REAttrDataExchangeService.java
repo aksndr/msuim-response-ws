@@ -2,7 +2,6 @@ package ru.terralink.ws.msuim.impl;
 
 import com.opentext.livelink.service.core.*;
 import com.opentext.livelink.service.docman.*;
-import com.opentext.livelink.service.docman.Node;
 import com.opentext.ecm.services.authws.AuthenticationService;
 import com.sun.xml.ws.api.message.Headers;
 import com.sun.xml.ws.api.message.Header;
@@ -21,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-import ru.terralink.ws.msuim.AttachmentInfo;
+import ru.terralink.ws.msuim.AttachmentsInfo;
 import ru.terralink.ws.msuim.OpenTextAdapter;
 import ru.terralink.ws.msuim.REAttrDataExchange;
 import ru.terralink.ws.object.request.REDataExchangeAttrECD;
@@ -67,8 +66,8 @@ public class REAttrDataExchangeService implements REAttrDataExchange {
     @Qualifier("openTextAdapter")
     public OpenTextAdapter openTextAdapter;
     @Autowired
-    @Qualifier("attachmentInfo")
-    private AttachmentInfo attachmentInfo;
+    @Qualifier("attachmentsInfo")
+    private AttachmentsInfo attachmentsInfo;
 
     @Override
     @WebMethod(operationName = "REAttrDataExchangeResponseMessage", action = "REAttrDataExchangeResponseMessage")
@@ -83,12 +82,17 @@ public class REAttrDataExchangeService implements REAttrDataExchange {
 
         JSONObject requestData = buildReAttrExchangeRequest(reAttrDataExchangeResponse);
         byte[] httPostRequest = createHttpPostRequest(requestData, MSUIMSYNC_SET_MSUIM_RESPONSE);
-
-        post(httPostRequest);
+        String otdsToken = null;
+        try {
+            otdsToken = getOTDSAuthToken();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        post(httPostRequest, otdsToken);
         return null;
     }
 
-    private String post(byte[] httPostRequest) {
+    private String post(byte[] httPostRequest, String otdsToken) {
         try {
             URL url = new URL(openTextAdapter.getOpenTextUrl());
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -100,6 +104,9 @@ public class REAttrDataExchangeService implements REAttrDataExchange {
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             conn.setRequestProperty("charset", "utf-8");
             conn.setRequestProperty("Content-Length", Integer.toString(httPostRequest.length));
+            conn.setRequestProperty("Referer", openTextAdapter.getOpenTextUrl());
+            if (otdsToken != null)
+                conn.setRequestProperty("Cookie", "OTDSTicket=" + otdsToken + ";, LLTZCookie=0");
             conn.setUseCaches(false);
 
             DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
@@ -169,7 +176,14 @@ public class REAttrDataExchangeService implements REAttrDataExchange {
         return response;
     }
 
-    private JSONObject buildReAttrExchangeRequest2(Object reAttrDataExchangeResponse) {
+    private JSONObject buildReAttrExchangeRequest2(REDataExchangeAttrECD reAttrDataExchangeResponse) {
+        if (reAttrDataExchangeResponse.getAttrFile() != null && !reAttrDataExchangeResponse.getAttrFile().isEmpty()) {
+            for (REDataExchangeAttrFile file : reAttrDataExchangeResponse.getAttrFile()) {
+
+                file.setMimeType("pdf");
+            }
+        }
+
         JSONObject r = new JSONObject(reAttrDataExchangeResponse);
         return r;
     }
@@ -232,74 +246,66 @@ public class REAttrDataExchangeService implements REAttrDataExchange {
             if (CollectionUtils.isEmpty(reAttrDataExchangeMessage.getAttrFile()))
                 throw new RuntimeException("Attribute AttrFile not found!");
 
-            for (REDataExchangeAttrFile attrFile : reAttrDataExchangeMessage.getAttrFile()) {
-                String fileName = attrFile.getFILENAME();
-                logger.info("File Name : " + fileName);
+            String otdsToken = getOTDSAuthToken();
+            logger.info("Got OTDS token: " + otdsToken);
 
-                String otdsAuthToken = getOTDSAuthToken();
-                logger.info("Got OTDS token: " + otdsAuthToken);
-
-                Authentication authClient = getAuthenticationClient();
-                String csAuthToken = validateOTDSAuthToken(authClient, otdsAuthToken);
+            Authentication authClient = getAuthenticationClient();
+            String csAuthToken = validateOTDSAuthToken(authClient, otdsToken);
 //                String csAuthToken = authClient.authenticateUser("otadmin@otds.admin", "Qwerty!234");
-                logger.info("Got csAuth token: " + csAuthToken);
-                DocumentManagement docManClient = getDocumentManagement(csAuthToken);
+            logger.info("Got csAuth token: " + csAuthToken);
+            DocumentManagement docManClient = getDocumentManagement(csAuthToken);
 
-//                Long parentId = getDataID(reAttrDataExchangeMessage.getHeader().getObjectNumber());
 
-                JSONObject ob = buildReAttrExchangeRequest2(reAttrDataExchangeMessage);
-                Long parentId = getDataID(ob);
+            JSONObject ob = buildReAttrExchangeRequest2(reAttrDataExchangeMessage);
+            JSONObject res = getDataID(ob, otdsToken);
+            JSONArray values = res.getJSONArray("value");
+            for (int i = 0; i < values.length(); i++) {
+                JSONObject value = values.getJSONObject(i);
 
-                if (attrFile.isDelete()) {
-                    logger.info("File requested to be deleted.");
-                    Node attachment = docManClient.getNodeByName(parentId, fileName);
-                    if (attachment == null) {
-                        logger.warn(String.format("Attachment <%s> were not found in document <%s>.", fileName, parentId));
-                        continue;
-                    }
-
-                    docManClient.deleteNode(attachment.getID());
-                    logger.info(String.format("Attachment <%s> in document <%s> were deleted.", fileName, parentId));
-                } else {
-                    String contentType = attachmentInfo.getContentType();
-                    if (contentType == null || contentType == TEXT_PLAIN)
-                        contentType = OCTET_STREAM;
-
-                    logger.info("Content Type : " + contentType);
-
-                    BufferedInputStream inputStream = new BufferedInputStream(attachmentInfo.getInputStream());
-                    byte[] content = toByteArray(inputStream);
-                    long inputStreamLength = content.length;
-                    logger.info("Content size : " + inputStreamLength);
-
-                    String contextID = generateContextId(docManClient, parentId, fileName);
-                    logger.info("Got contextID: " + contextID);
-
-                    FileAtts fileAtts = createFileAtts(fileName, inputStreamLength, attrFile.getDATUM(), contentType);
-
-                    ContentService contentServiceClient = getContentServiceClient(csAuthToken, contextID, fileAtts);
-
-                    logger.info("Uploading document...");
-                    String objectID = contentServiceClient.uploadContent(new DataHandler(content, contentType));
-                    logger.info(RESULT_SUCCESS + "\nNew document uploaded with ID = " + objectID);
+                logger.info("MSUIMID : " + value.get("MSUIMID"));
+                if (!value.has("DataID")){
+                    logger.error("OTCS Does not returned dataid for : " + value.get("MSUIMID"));
+                    continue;
                 }
+                Integer dataID = (Integer)value.get("DataID");
+                String fileName = reAttrDataExchangeMessage.getAttrFile().get(i).getFILENAME();
+                XMLGregorianCalendar fileDate = reAttrDataExchangeMessage.getAttrFile().get(i).getDATUM();
+                String contentType = attachmentsInfo.getAttachment(i).getContentType();
+
+                BufferedInputStream inputStream = new BufferedInputStream(attachmentsInfo.getAttachment(i).getInputStream());
+                byte[] content = toByteArray(inputStream);
+                long inputStreamLength = content.length;
+                logger.info("Content size : " + inputStreamLength);
+
+                //String contextID = generateContextId(docManClient, dataID, fileName);
+                String contextID = docManClient.addVersionContext(dataID, null);
+                logger.info("Got contextID: " + contextID);
+
+                FileAtts fileAtts = createFileAtts(fileName, inputStreamLength, fileDate, contentType);
+
+                ContentService contentServiceClient = getContentServiceClient(csAuthToken, contextID, fileAtts);
+
+                logger.info("Uploading document...");
+                String objectID = contentServiceClient.uploadContent(new DataHandler(content, contentType));
+                logger.info(RESULT_SUCCESS + "\nNew document uploaded with ID = " + objectID);
+
             }
+
         } catch (Exception e) {
             logger.error(RESULT_FAILED + "\n" + e.getMessage());
         }
+        logger.info("Finished");
     }
 
-    private Long getDataID(Object ob) throws Exception {
+    private JSONObject getDataID(Object ob, String otdsToken) throws Exception {
         byte[] httPostRequest = createHttpPostRequest(ob, MSUIMSYNC_GET_DATAID_BY_MSUIMNUM);
 
-        String response = post(httPostRequest);
+        String response = post(httPostRequest, otdsToken);
         JSONObject o = new JSONObject(response.toString());
         if (!o.getBoolean("ok")) {
             throw new Exception(o.getString("errMsg"));
         }
-
-        Long dataId = o.getLong("value");
-        return dataId;
+        return o;
     }
 
     private String getOTDSAuthToken() throws Exception {
@@ -389,9 +395,9 @@ public class REAttrDataExchangeService implements REAttrDataExchange {
         return fileAtts;
     }
 
-    private String getFilename(String filename, String contentType){
+    private String getFilename(String filename, String contentType) {
         String extension = FilenameUtils.getExtension(filename);
-        if (extension == null || extension == ""){
+        if (extension == null || extension == "") {
             try {
                 extension = getExtensionByMimeType(contentType);
                 filename += extension;
@@ -424,11 +430,11 @@ public class REAttrDataExchangeService implements REAttrDataExchange {
     }
 
 
-    public void setAttachmentInfo(AttachmentInfo attachmentInfo) {
-        this.attachmentInfo = attachmentInfo;
+    public void setAttachmentsInfo(AttachmentsInfo attachmentsInfo) {
+        this.attachmentsInfo = attachmentsInfo;
     }
 
-    public AttachmentInfo getAttachmentInfo() {
-        return attachmentInfo;
+    public AttachmentsInfo getAttachmentsInfo() {
+        return attachmentsInfo;
     }
 }
