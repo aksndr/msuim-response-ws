@@ -7,7 +7,7 @@ public class Attachment {
 
     private String contentType;
     private InputStream inputStream;
-
+    private byte[] content;
 
     public String getContentType() {
         return contentType;
@@ -23,6 +23,14 @@ public class Attachment {
 
     public void setInputStream(InputStream inputStream) {
         this.inputStream = inputStream;
+    }
+
+    public byte[] getContent() {
+        return content;
+    }
+
+    public void setContent(byte[] content) {
+        this.content = content;
     }
 
 }

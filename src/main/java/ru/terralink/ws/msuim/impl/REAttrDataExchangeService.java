@@ -1,17 +1,15 @@
 package ru.terralink.ws.msuim.impl;
 
-import com.opentext.livelink.service.core.*;
-import com.opentext.livelink.service.docman.*;
 import com.opentext.ecm.services.authws.AuthenticationService;
-import com.sun.xml.ws.api.message.Headers;
+import com.opentext.livelink.service.core.*;
+import com.opentext.livelink.service.docman.DocumentManagement;
+import com.opentext.livelink.service.docman.DocumentManagement_Service;
 import com.sun.xml.ws.api.message.Header;
+import com.sun.xml.ws.api.message.Headers;
 import com.sun.xml.ws.developer.JAXWSProperties;
 import com.sun.xml.ws.developer.WSBindingProvider;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.tika.config.TikaConfig;
-import org.apache.tika.mime.MimeType;
 import org.apache.tika.mime.MimeTypeException;
-import org.apache.tika.mime.MimeTypes;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -20,11 +18,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import ru.terralink.ws.common.Utils;
+import ru.terralink.ws.msuim.Attachment;
 import ru.terralink.ws.msuim.AttachmentsInfo;
 import ru.terralink.ws.msuim.OpenTextAdapter;
 import ru.terralink.ws.msuim.REAttrDataExchange;
 import ru.terralink.ws.object.request.REDataExchangeAttrECD;
-import ru.terralink.ws.object.request.REDataExchangeAttrFile;
 import ru.terralink.ws.object.response.REAttrDataExchangeResponse;
 
 import javax.activation.DataHandler;
@@ -34,15 +33,20 @@ import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
-import javax.xml.soap.*;
+import javax.xml.soap.MessageFactory;
+import javax.xml.soap.SOAPElement;
+import javax.xml.soap.SOAPHeader;
+import javax.xml.soap.SOAPHeaderElement;
 import javax.xml.ws.BindingType;
-
 import javax.xml.ws.soap.MTOMFeature;
-
-
 import javax.xml.ws.soap.SOAPBinding;
-import java.io.*;
-import java.net.*;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,6 +69,7 @@ public class REAttrDataExchangeService implements REAttrDataExchange {
     @Autowired
     @Qualifier("openTextAdapter")
     public OpenTextAdapter openTextAdapter;
+
     @Autowired
     @Qualifier("attachmentsInfo")
     private AttachmentsInfo attachmentsInfo;
@@ -76,6 +81,7 @@ public class REAttrDataExchangeService implements REAttrDataExchange {
             targetNamespace = "http://inform.gazprom.ru/C/SUIM/REDataExchange")
                                                     REAttrDataExchangeResponse reAttrDataExchangeResponse) {
         logger.error("Run sendReAttrDataExchangeResponse ...");
+
         if (reAttrDataExchangeResponse == null) {
             logger.error("Argument REAttrDataExchangeResponse = null.");
         }
@@ -177,13 +183,6 @@ public class REAttrDataExchangeService implements REAttrDataExchange {
     }
 
     private JSONObject buildReAttrExchangeRequest2(REDataExchangeAttrECD reAttrDataExchangeResponse) {
-        if (reAttrDataExchangeResponse.getAttrFile() != null && !reAttrDataExchangeResponse.getAttrFile().isEmpty()) {
-            for (REDataExchangeAttrFile file : reAttrDataExchangeResponse.getAttrFile()) {
-
-                file.setMimeType("pdf");
-            }
-        }
-
         JSONObject r = new JSONObject(reAttrDataExchangeResponse);
         return r;
     }
@@ -240,21 +239,23 @@ public class REAttrDataExchangeService implements REAttrDataExchange {
     @Oneway
     public void reAttrDataExchangeMessage(@WebParam(name = "REAttrDataExchangeMessage", partName = "REAttrDataExchangeMessage")
                                           REDataExchangeAttrECD reAttrDataExchangeMessage) {
+
+        List<Attachment> attachments = attachmentsInfo.getAttachments();
+        attachmentsInfo.setAttachments(new ArrayList<Attachment>());
+
         logger.info("Run sendReAttrDataExchangeMessage...");
         try {
-
             if (CollectionUtils.isEmpty(reAttrDataExchangeMessage.getAttrFile()))
                 throw new RuntimeException("Attribute AttrFile not found!");
 
             String otdsToken = getOTDSAuthToken();
-            logger.info("Got OTDS token: " + otdsToken);
+            logger.info("OTDS token: " + otdsToken);
 
             Authentication authClient = getAuthenticationClient();
             String csAuthToken = validateOTDSAuthToken(authClient, otdsToken);
 //                String csAuthToken = authClient.authenticateUser("otadmin@otds.admin", "Qwerty!234");
             logger.info("Got csAuth token: " + csAuthToken);
             DocumentManagement docManClient = getDocumentManagement(csAuthToken);
-
 
             JSONObject ob = buildReAttrExchangeRequest2(reAttrDataExchangeMessage);
             JSONObject res = getDataID(ob, otdsToken);
@@ -269,11 +270,16 @@ public class REAttrDataExchangeService implements REAttrDataExchange {
                 }
                 Integer dataID = (Integer)value.get("DataID");
                 String fileName = reAttrDataExchangeMessage.getAttrFile().get(i).getFILENAME();
-                XMLGregorianCalendar fileDate = reAttrDataExchangeMessage.getAttrFile().get(i).getDATUM();
-                String contentType = attachmentsInfo.getAttachment(i).getContentType();
+                logger.info("Attr file filename: " + fileName);
 
-                BufferedInputStream inputStream = new BufferedInputStream(attachmentsInfo.getAttachment(i).getInputStream());
-                byte[] content = toByteArray(inputStream);
+                XMLGregorianCalendar fileDate = reAttrDataExchangeMessage.getAttrFile().get(i).getDATUM();
+
+                Attachment attachment = attachments.get(i);
+                logger.info("attachmentsInfo contentType: " + attachment.getContentType());
+
+                String contentType = attachment.getContentType();
+
+                byte[] content = attachment.getContent();
                 long inputStreamLength = content.length;
                 logger.info("Content size : " + inputStreamLength);
 
@@ -288,12 +294,12 @@ public class REAttrDataExchangeService implements REAttrDataExchange {
                 logger.info("Uploading document...");
                 String objectID = contentServiceClient.uploadContent(new DataHandler(content, contentType));
                 logger.info(RESULT_SUCCESS + "\nNew document uploaded with ID = " + objectID);
-
             }
 
         } catch (Exception e) {
             logger.error(RESULT_FAILED + "\n" + e.getMessage());
         }
+
         logger.info("Finished");
     }
 
@@ -399,7 +405,7 @@ public class REAttrDataExchangeService implements REAttrDataExchange {
         String extension = FilenameUtils.getExtension(filename);
         if (extension == null || extension == "") {
             try {
-                extension = getExtensionByMimeType(contentType);
+                extension = Utils.getExtensionByMimeType(contentType);
                 filename += extension;
             } catch (MimeTypeException e) {
                 e.printStackTrace();
@@ -408,26 +414,7 @@ public class REAttrDataExchangeService implements REAttrDataExchange {
         return filename;
     }
 
-    private String getExtensionByMimeType(String contentType) throws MimeTypeException {
-        TikaConfig config = TikaConfig.getDefaultConfig();
-        MimeTypes allTypes = config.getMimeRepository();
-        MimeType t = allTypes.forName(contentType);
-        return t.getExtension();
-    }
 
-    private byte[] toByteArray(InputStream is) throws Exception {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        int reads = 0;
-        reads = is.read();
-        while (reads != -1) {
-            baos.write(reads);
-            reads = is.read();
-        }
-        baos.flush();
-        baos.close();
-
-        return baos.toByteArray();
-    }
 
 
     public void setAttachmentsInfo(AttachmentsInfo attachmentsInfo) {

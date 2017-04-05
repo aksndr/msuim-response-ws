@@ -2,18 +2,14 @@ package ru.terralink.ws.msuim;
 
 import org.springframework.stereotype.Component;
 
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-/**
- * Created by AzarovD on 03.02.2016.
- * Modified by Arzamastsev AV on 08.03.2017
- */
 @Component("attachmentsInfo")
 public class AttachmentsInfo {
+
+    public AttachmentsInfo() {
+    }
 
     private List<Attachment> attachments = new ArrayList<>();
 

@@ -3,16 +3,12 @@ package ru.terralink.ws.object.request;
 
 import org.springframework.stereotype.Component;
 
-import java.math.BigInteger;
-import java.util.GregorianCalendar;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.math.BigInteger;
+import java.util.GregorianCalendar;
 
 
 /**
@@ -53,7 +49,6 @@ import javax.xml.datatype.XMLGregorianCalendar;
     "allHash",
     "nomer",
     "filename",
-    "mimeType",
     "users",
     "userstxt",
     "datum",
@@ -76,8 +71,6 @@ public class REDataExchangeAttrFile {
     protected BigInteger nomer;
     @XmlElement(name = "FILE_NAME", required = true)
     protected String filename;
-    @XmlElement(name = "MIME_Type")
-    protected String mimeType;
     @XmlElement(name = "USERS")
     protected String users;
     @XmlElement(name = "USERSTXT")
@@ -256,13 +249,6 @@ public class REDataExchangeAttrFile {
         this.filename = value;
     }
 
-    public String getMimeType() {
-        return mimeType;
-    }
-
-    public void setMimeType(String mimeType) {
-        this.mimeType = mimeType;
-    }
     /**
      * Gets the value of the users property.
      * 

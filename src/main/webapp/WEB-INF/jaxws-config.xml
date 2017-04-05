@@ -16,7 +16,7 @@
         <wss:service>
             <ws:service bean="#reAttrDataExchangeService">
                 <ws:handlers>
-                    <bean class="ru.terralink.ws.msuim.handler.MsuimSoapHandler" />
+                    <bean class="ru.terralink.ws.msuim.handler.MsuimSoapHandler" scope="prototype"/>
                 </ws:handlers>
             </ws:service>
         </wss:service>
