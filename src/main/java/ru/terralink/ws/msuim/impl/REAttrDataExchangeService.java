@@ -27,6 +27,7 @@ import ru.terralink.ws.object.request.REDataExchangeAttrECD;
 import ru.terralink.ws.object.response.REAttrDataExchangeResponse;
 
 import javax.activation.DataHandler;
+import javax.annotation.Resource;
 import javax.jws.Oneway;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -38,6 +39,7 @@ import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPHeaderElement;
 import javax.xml.ws.BindingType;
+import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.soap.MTOMFeature;
 import javax.xml.ws.soap.SOAPBinding;
 import java.io.BufferedReader;
@@ -55,8 +57,11 @@ import static ru.terralink.ws.msuim.constant.REAttrDataExchangeOutConstant.*;
 /**
  * Created by AzarovD on 19.01.2016.
  */
+
+
 @Component("reAttrDataExchangeService")
 @javax.jws.soap.SOAPBinding(parameterStyle = javax.jws.soap.SOAPBinding.ParameterStyle.BARE)
+
 @WebService(targetNamespace = "http://inform.gazprom.ru/C/SUIM/REDataExchange",
         endpointInterface = "ru.terralink.ws.msuim.impl.REAttrDataExchangeService")
 
@@ -65,6 +70,9 @@ import static ru.terralink.ws.msuim.constant.REAttrDataExchangeOutConstant.*;
 public class REAttrDataExchangeService implements REAttrDataExchange {
 
     private static final Logger logger = LoggerFactory.getLogger(REAttrDataExchangeService.class.getSimpleName());
+
+    @Resource
+    private WebServiceContext context;
 
     @Autowired
     @Qualifier("openTextAdapter")
@@ -280,20 +288,24 @@ public class REAttrDataExchangeService implements REAttrDataExchange {
                 String contentType = attachment.getContentType();
 
                 byte[] content = attachment.getContent();
-                long inputStreamLength = content.length;
-                logger.info("Content size : " + inputStreamLength);
+                long contentLength = content.length;
+                logger.info("Content size : " + contentLength);
 
-                //String contextID = generateContextId(docManClient, dataID, fileName);
                 String contextID = docManClient.addVersionContext(dataID, null);
                 logger.info("Got contextID: " + contextID);
 
-                FileAtts fileAtts = createFileAtts(fileName, inputStreamLength, fileDate, contentType);
+                FileAtts fileAtts = createFileAtts(fileName, contentLength, fileDate, contentType);
 
                 ContentService contentServiceClient = getContentServiceClient(csAuthToken, contextID, fileAtts);
 
                 logger.info("Uploading document...");
                 String objectID = contentServiceClient.uploadContent(new DataHandler(content, contentType));
                 logger.info(RESULT_SUCCESS + "\nNew document uploaded with ID = " + objectID);
+
+                if (value.has("IsTemp") && (Boolean)value.get("IsTemp")){
+                    addAgentTask(dataID, otdsToken);
+                }
+
             }
 
         } catch (Exception e) {
@@ -301,6 +313,16 @@ public class REAttrDataExchangeService implements REAttrDataExchange {
         }
 
         logger.info("Finished");
+    }
+
+    private void addAgentTask(Integer dataID, String otdsToken) throws Exception {
+        byte[] httPostRequest = createHttpPostRequest(dataID, MSUIMSYNC_ADD_AGENT_TASK);
+
+        String response = post(httPostRequest, otdsToken);
+        JSONObject o = new JSONObject(response.toString());
+        if (!o.getBoolean("ok")) {
+            throw new Exception(o.getString("errMsg"));
+        }
     }
 
     private JSONObject getDataID(Object ob, String otdsToken) throws Exception {

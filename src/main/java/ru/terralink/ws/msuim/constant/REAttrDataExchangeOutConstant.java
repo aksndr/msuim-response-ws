@@ -1,8 +1,5 @@
 package ru.terralink.ws.msuim.constant;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Created by AzarovD on 19.01.2016.
  */
@@ -10,6 +7,7 @@ public class REAttrDataExchangeOutConstant {
     public static final String MSUIMSYNC_SET_MSUIM_RESPONSE = "msuimsync.setMsuimResponse";
     public static final String MSUIMSYNC_GET_DATAID_BY_DOCNUM = "msuimsync.getDataIDByDocumentNumber";
     public static final String MSUIMSYNC_GET_DATAID_BY_MSUIMNUM = "msuimsync.getDataIDByMSUIMNum";
+    public static final String MSUIMSYNC_ADD_AGENT_TASK = "msuimsync.addAgentTask";
     public static final String FUNCTION_PREFIX = "func";
     public static final String SEPARATOR = "=";
     public static final String AND = "&";

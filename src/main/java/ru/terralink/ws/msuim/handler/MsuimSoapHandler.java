@@ -1,9 +1,5 @@
 package ru.terralink.ws.msuim.handler;
 
-/**
- * Created by AzarovD on 02.02.2016.
- */
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +26,9 @@ public class MsuimSoapHandler implements SOAPHandler<SOAPMessageContext> {
     @Qualifier("attachmentsInfo")
     private AttachmentsInfo attachmentsInfo;
 
+    public MsuimSoapHandler() {
+    }
+
     @Override
     public boolean handleMessage(SOAPMessageContext context) {
 
@@ -41,7 +40,7 @@ public class MsuimSoapHandler implements SOAPHandler<SOAPMessageContext> {
 
             try {
                 SOAPMessage soapMsg = context.getMessage();
-
+                context.put("test","test");
                 String[] mimeHeader = soapMsg.getSOAPPart().getMimeHeader("Content-type");
 
                 for(String str : mimeHeader){
